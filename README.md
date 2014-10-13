@@ -1,5 +1,5 @@
-# Getting and Cleaning Data Project
-This is a repository with the code for Getting and Cleaning Data per assignment.
+# Getting and Cleaning Data-Coursera
+This is a repository with the code for the Getting and Cleaning Data peer assignment.
 
 # The data
 The data used on this script can be found [here](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
@@ -17,7 +17,7 @@ The data is in a folder titled **UCI HAR Dataset**.  We will use the following f
 
 # The code
 
-This project has one script **run_analysis.R**.  This code turns all the files above on two tidy datasets by doing the following:
+This project has one script **run_analysis.R**.  This code turns all the above files on two tidy datasets by doing the following:
 
 1. Merges the training and the test sets to create one dataset.
 2. Extract only the measurements on the mean and standard deviation (dataset1.csv) for each measurement.
