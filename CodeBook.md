@@ -17,15 +17,15 @@ The data is found in a folder titled **UCI HAR Dataset**; the following files ar
 
 ## Output
 The run_analysis.R script performs the following
-1. Read X_train.txt, y_train.txt and subject_test.txt stored in *trainData*, *trainLabel*, and *trainSubject* respectively.
-2. Read X_test.txt, y_test.txt and subject_train.txt stored in *testData*, *testLabel*, and *testsubject* respectively.
-3. Concatenate *testData* to *trainData* to generate a 10299x561 dataframe (*joinData*); concatenate *testLabel* to *trainLabel* to generate a 10299x1 dataframe (*joinLabel*); concatenate *testSubject* to *trainSubject* to generate a 10299x1 dataframe (*joinSubject*).
-4. Read features.txt and store the data in a variable called *features*.  Extract the mesurements on the mean and standard deviation resulting in a 66 indices list.  A subset of *joinData* with the 66 corresponding columns will be obtained.
-5. Clean the column names of the subset by removing the "()" and "-" symbols in the names and changing the first letter of "mean" and "std" to an uppercase "M" and "S" respectively.
-6. Read activity_labels.txt and store the data in a variable called *activity*.
-7. Clean the activity names in the second column of *activity*.  Change the names to lower case.  If the name has an underscore between letters, underscore is removed and capitalised immediately after the underscore.
-8. Transform the values of *joinLabel* according to the *activity* dataframe.
-9. Combine the *joinSubject*, *joinLabel*, and *joinData* by column to get a new and cleaned 10299x68 dataframe.
-10. Write the *cleanedData* to "merged_data.txt" file into the current working directory.
-11. Generate a second independant tidy dataset with the average of each measurement for each activity and each subject.  There are 30 unique subjects and 6 unique activities, which result in a 180 combinations of the two.  For each combination, calculate the mean of each memasurement with the corresponding frame.
-12. Finally, write the *result* to "data_with_means.txt" in the current working directory.
+* Read X_train.txt, y_train.txt and subject_test.txt stored in *trainData*, *trainLabel*, and *trainSubject* respectively.
+* Read X_test.txt, y_test.txt and subject_train.txt stored in *testData*, *testLabel*, and *testsubject* respectively.
+* Concatenate *testData* to *trainData* to generate a 10299x561 dataframe (*joinData*); concatenate *testLabel* to *trainLabel* to generate a 10299x1 dataframe (*joinLabel*); concatenate *testSubject* to *trainSubject* to generate a 10299x1 dataframe (*joinSubject*).
+* Read features.txt and store the data in a variable called *features*.  Extract the mesurements on the mean and standard deviation resulting in a 66 indices list.  A subset of *joinData* with the 66 corresponding columns will be obtained.
+* Clean the column names of the subset by removing the "()" and "-" symbols in the names and changing the first letter of "mean" and "std" to an uppercase "M" and "S" respectively.
+* Read activity_labels.txt and store the data in a variable called *activity*.
+* Clean the activity names in the second column of *activity*.  Change the names to lower case.  If the name has an underscore between letters, underscore is removed and capitalised immediately after the underscore.
+* Transform the values of *joinLabel* according to the *activity* dataframe.
+* Combine the *joinSubject*, *joinLabel*, and *joinData* by column to get a new and cleaned 10299x68 dataframe.
+* Write the *cleanedData* to "merged_data.txt" file into the current working directory.
+* Generate a second independant tidy dataset with the average of each measurement for each activity and each subject.  There are 30 unique subjects and 6 unique activities, which result in a 180 combinations of the two.  For each combination, calculate the mean of each memasurement with the corresponding frame.
+* Finally, write the *result* to "data_with_means.txt" in the current working directory.
