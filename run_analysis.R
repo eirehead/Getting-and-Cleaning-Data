@@ -1,61 +1,71 @@
-# Load column names
-column_names <- read.table("features.txt")
-# Filter columns (only mean and std measurements)
-column_indexes <- grep("mean|std", column_names[, 2])
+dim(trainData) # 7352*561
+head(trainData)
+trainLabel <- read.table("train/y_train.txt")
+table(trainLabel)
+trainSubject <- read.table("train/subject_train.txt")
+testData <- read.table("test/X_test.txt")
+dim(testData) # 2947*561
+testLabel <- read.table("test/y_test.txt") 
+table(testLabel) 
+testSubject <- read.table("test/subject_test.txt")
+joinData <- rbind(trainData, testData)
+dim(joinData) # 10299*561
+joinLabel <- rbind(trainLabel, testLabel)
+dim(joinLabel) # 10299*1
+joinSubject <- rbind(trainSubject, testSubject)
+dim(joinSubject) # 10299*1
 
-# Load activity labels for y datasets
-activity_labels <- read.table("activity_labels.txt")
+# Step2. Extracts only the measurements on the mean and standard 
+# deviation for each measurement. 
+features <- read.table("features.txt")
+dim(features)  # 561*2
+meanStdIndices <- grep("mean\\(\\)|std\\(\\)", features[, 2])
+length(meanStdIndices) # 66
+joinData <- joinData[, meanStdIndices]
+dim(joinData) # 10299*66
+names(joinData) <- gsub("\\(\\)", "", features[meanStdIndices, 2]) # remove "()"
+names(joinData) <- gsub("mean", "Mean", names(joinData)) # capitalize M
+names(joinData) <- gsub("std", "Std", names(joinData)) # capitalize S
+names(joinData) <- gsub("-", "", names(joinData)) # remove "-" in column names 
 
-# Load files (subject)
-subject_test <- read.table("test/subject_test.txt")
-subject_train <- read.table("train/subject_train.txt")
-# Set labels for subject datasets
-names(subject_test) <- c("subjectnumber")
-names(subject_train) <- c("subjectnumber")
+# Step3. Uses descriptive activity names to name the activities in 
+# the data set
+activity <- read.table("activity_labels.txt")
+activity[, 2] <- tolower(gsub("_", "", activity[, 2]))
+substr(activity[2, 2], 8, 8) <- toupper(substr(activity[2, 2], 8, 8))
+substr(activity[3, 2], 8, 8) <- toupper(substr(activity[3, 2], 8, 8))
+activityLabel <- activity[joinLabel[, 1], 2]
+joinLabel[, 1] <- activityLabel
+names(joinLabel) <- "activity"
 
-# Load files (x)
-x_test <- read.table("test/X_test.txt")
-x_train <- read.table("train/X_train.txt")
-# Get only columns with mean and std
-x_test <- x_test[, column_indexes]
-x_train <- x_train[, column_indexes]
-# Set labels for x datasets
-names(x_test) <- column_names[column_indexes, 2]
-names(x_train) <- column_names[column_indexes, 2]
+# Step4. Appropriately labels the data set with descriptive activity 
+# names. 
+names(joinSubject) <- "subject"
+cleanedData <- cbind(joinSubject, joinLabel, joinData)
+dim(cleanedData) # 10299*68
+write.table(cleanedData, "merged_data.txt") # write out the 1st dataset
 
-# Load files (y)
-y_test <- read.table("test/y_test.txt")
-y_train <- read.table("train/y_train.txt")
+# Step5. Creates a second, independent tidy data set with the average of 
+# each variable for each activity and each subject. 
+subjectLen <- length(table(joinSubject)) # 30
+activityLen <- dim(activity)[1] # 6
+columnLen <- dim(cleanedData)[2]
+result <- matrix(NA, nrow=subjectLen*activityLen, ncol=columnLen) 
+result <- as.data.frame(result)
+colnames(result) <- colnames(cleanedData)
+row <- 1
+for(i in 1:subjectLen) {
+  for(j in 1:activityLen) {
+    result[row, 1] <- sort(unique(joinSubject)[, 1])[i]
+    result[row, 2] <- activity[j, 2]
+    bool1 <- i == cleanedData$subject
+    bool2 <- activity[j, 2] == cleanedData$activity
+    result[row, 3:columnLen] <- colMeans(cleanedData[bool1&bool2, 3:columnLen])
+    row <- row + 1
+  }
+}
+head(result)
+write.table(result, "data_with_means.txt") # write out the 2nd dataset
 
-# Merge y datasets (train and test) with activity labels
-y_test <- merge(activity_labels, y_test)
-y_train <- merge(activity_labels, y_train)
-
-# Set labels for y datasets
-names(y_test) <- c("activitycode", "activitydescription")
-names(y_train) <- c("activitycode", "activitydescription")
-
-# Create data frame from test data
-test_df <- data.frame(subject_test, y_test, x_test)
-# Create data frame from train data
-train_df <- data.frame(subject_train, y_train, x_train)
-
-# Combine test and train data frame
-dataset <- rbind(test_df, train_df)
-
-# Split dataset by subject and activity
-splitdatasets <- split(dataset, list(dataset$subjectnumber, dataset$activitycode), drop=TRUE)
-
-# Calculate column means (only to certain columns) and transpose
-colmeans <- data.frame(t(sapply(splitdatasets, function(x) colMeans(x[, 4:82] ,na.rm=TRUE))))
-
-# Get row names
-subject.activity <- row.names(colmeans)
-# Delete row.names column
-row.names(colmeans) <- NULL
-# Create new subject.activity column
-colmeans <- cbind(subject.activity, colmeans)
-
-# Save the two tidy datasets
-write.csv(dataset, file="dataset1.csv")
-write.csv(colmeans, file="dataset2.csv")
+# data <- read.table("data_with_means.txt")
+# data[1:12, 1:3]
